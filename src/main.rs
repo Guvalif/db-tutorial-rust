@@ -1,5 +1,7 @@
 use std::io::{stdin, stdout, Write};
-use std::process::exit;
+
+mod meta_command;
+mod statement;
 
 fn print_prompt() {
     print!("db > ");
@@ -7,21 +9,28 @@ fn print_prompt() {
     stdout().flush().unwrap();
 }
 
-fn main() {
-    let mut line = String::new();
+fn interpreter() {
+    print_prompt();
 
-    loop {
-        print_prompt();
+    let command = {
+        let mut line = String::new();
 
         stdin().read_line(&mut line).expect("Unrecognized input.");
 
-        let input = line.split_whitespace().next().unwrap();
+        line.trim().to_owned()
+    };
 
-        match input {
-            ".exit" => exit(0),
-            _ => println!("Unrecognized command '{}'.", input),
-        }
+    let result: Result<(), String> = match command {
+        _ if command == "" => Ok(()),
+        _ if command.starts_with(".") => meta_command::execute(&command),
+        _ => statement::prepare(&command).map(|s| s.execute()),
+    };
 
-        line.clear();
+    result.unwrap_or_else(|e| println!("{}", e));
+}
+
+fn main() {
+    loop {
+        interpreter();
     }
 }
