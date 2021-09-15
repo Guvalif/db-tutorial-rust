@@ -27,12 +27,20 @@ fn string_to_fixedbytes<const N: usize>(string: &str) -> [u8; N] {
 }
 
 impl Row {
-    pub fn new(id: u32, username: &str, email: &str) -> Row {
-        Row {
+    pub fn new(id: u32, username: &str, email: &str) -> Result<Row, String> {
+        if username.len() > COLUMN_USERNAME_SIZE {
+            return Err("Error: 'username' is too long.".to_owned());
+        }
+
+        if email.len() > COLUMN_EMAIL_SIZE {
+            return Err("Error: 'email' is too long.".to_owned());
+        }
+
+        Ok(Row {
             id,
             username: string_to_fixedbytes(username),
             email: string_to_fixedbytes(email),
-        }
+        })
     }
 }
 
@@ -42,8 +50,8 @@ impl fmt::Display for Row {
             f,
             "Row {{ id: {}, username: \"{}\", email: \"{}\" }}",
             self.id,
-            from_utf8(&self.username).unwrap(),
-            from_utf8(&self.email).unwrap()
+            from_utf8(&self.username).unwrap().trim_matches('\0'),
+            from_utf8(&self.email).unwrap().trim_matches('\0')
         )
     }
 }

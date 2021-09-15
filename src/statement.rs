@@ -23,9 +23,10 @@ fn prepare_insert_handler(command: &str) -> Result<Statement, String> {
     let id = iter.next().and_then(|v| v.parse::<u32>().ok());
     let username = iter.next();
     let email = iter.next();
+    let eos = iter.next();
 
-    match (id, username, email) {
-        (Some(id), Some(username), Some(email)) => Ok(Statement {
+    match (id, username, email, eos) {
+        (Some(id), Some(username), Some(email), None) => Ok(Statement {
             s_type: StatementType::StatementInsert,
             s_params: StatementParams::InsertParams(id, username.to_owned(), email.to_owned()),
         }),
@@ -54,7 +55,7 @@ fn execute_insert_handler(table: &mut Table, params: &StatementParams) -> Result
         _ => panic!("Accepts only 'StatementParams::InsertParams'!"),
     };
 
-    table.insert(Row::new(*id, username, email)).map(|_| ())
+    Row::new(*id, username, email).and_then(|r| table.insert(r).map(|_| ()))
 }
 
 fn execute_select_handler(table: &Table) -> Result<(), String> {
