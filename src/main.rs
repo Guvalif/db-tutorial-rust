@@ -1,6 +1,7 @@
 use std::io::{stdin, stdout, Write};
 
 mod meta_command;
+mod pager;
 mod row;
 mod statement;
 mod table;
@@ -17,12 +18,14 @@ fn interpreter(table: &mut table::Table) {
     let command = {
         let mut line = String::new();
 
-        stdin().read_line(&mut line).expect("Unrecognized input.");
+        stdin()
+            .read_line(&mut line)
+            .expect("Fatal Error: Unrecognized input!");
 
         line.trim().to_owned()
     };
 
-    let result: Result<(), String> = match command {
+    let result = match command {
         _ if command.is_empty() => Ok(()),
         _ if command.starts_with('.') => meta_command::execute(&command),
         _ => statement::prepare(&command).and_then(|s| s.execute(table)),

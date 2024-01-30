@@ -4,7 +4,7 @@ use std::mem::size_of;
 use row::Row;
 
 const PAGE_SIZE: usize = 4096;
-const TABLE_MAX_PAGES: usize = 100;
+pub const TABLE_MAX_PAGES: usize = 100;
 const ROW_SIZE: usize = size_of::<Row>();
 const ROWS_PER_PAGE: usize = PAGE_SIZE / ROW_SIZE;
 const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;

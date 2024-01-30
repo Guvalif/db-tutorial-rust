@@ -52,7 +52,7 @@ pub fn prepare(command: &str) -> Result<Statement, String> {
 fn execute_insert_handler(table: &mut Table, params: &StatementParams) -> Result<(), String> {
     let (id, username, email) = match params {
         StatementParams::InsertParams(id, username, email) => (id, username, email),
-        _ => panic!("Accepts only 'StatementParams::InsertParams'!"),
+        _ => panic!("Fatal Error: Accepts only 'StatementParams::InsertParams'!"),
     };
 
     Row::new(*id, username, email).and_then(|r| table.insert(r).map(|_| ()))
